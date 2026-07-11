@@ -57,6 +57,7 @@
                             <th style="width:10rem">Customer</th>
                             <th style="width:9rem">Phone</th>
                             <th class="text-right" style="width:8rem">Expected (USD)</th>
+                            <th style="width:7rem">Method</th>
                             <th style="width:9rem">Claimed</th>
                             <th style="width:9rem"></th>
                         </tr>
@@ -64,7 +65,8 @@
                     <tbody>
                         @forelse ($orders as $order)
                             @php
-                                $claimedAt = $order->payments->last()?->created_at;
+                                $payment = $order->payments->last();
+                                $claimedAt = $payment?->created_at;
                                 $claimedMins = $claimedAt ? $claimedAt->diffInMinutes(now()) : 0;
                                 $isUrgent = $claimedMins >= $confirmMinutes;
                             @endphp
@@ -73,6 +75,11 @@
                                 <td><strong>{{ $order->user->name }}</strong></td>
                                 <td><span class="admin-mono">{{ $order->user->phone_number }}</span></td>
                                 <td class="text-right"><span class="admin-amount">${{ number_format((float) $order->total_amount, 2) }}</span></td>
+                                <td>
+                                    <span class="admin-badge {{ \App\Support\AdminUi::paymentMethodBadgeClass($payment?->method) }}">
+                                        {{ \App\Support\AdminUi::paymentMethodLabel($payment?->method) }}
+                                    </span>
+                                </td>
                                 <td>
                                     <span class="admin-time @if($isUrgent) urgent @endif">
                                         @include('components.admin.icons.clock')
@@ -91,7 +98,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="admin-empty">No orders awaiting payment confirmation.</td>
+                                <td colspan="7" class="admin-empty">No orders awaiting payment confirmation.</td>
                             </tr>
                         @endforelse
                     </tbody>

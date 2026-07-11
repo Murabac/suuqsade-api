@@ -12,6 +12,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'user_id',
     'product_link',
     'product_note',
+    'product_platform',
+    'product_title',
+    'product_description',
+    'product_images',
+    'product_metadata_status',
     'status',
     'batch_id',
     'item_cost',
@@ -27,6 +32,7 @@ class Order extends Model
     {
         return [
             'status' => OrderStatus::class,
+            'product_images' => 'array',
             'item_cost' => 'decimal:2',
             'service_fee_pct' => 'decimal:2',
             'shipping_fee' => 'decimal:2',

@@ -39,4 +39,8 @@ return [
         'server_key' => env('FCM_SERVER_KEY'),
     ],
 
+    'product_fetch' => [
+        'verify_ssl' => env('PRODUCT_FETCH_VERIFY_SSL', false),
+    ],
+
 ];

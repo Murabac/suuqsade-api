@@ -342,6 +342,8 @@ body.admin-app {
 .badge-quoted { background: #fefce8; color: #a16207; }
 .badge-payment-pending { background: #fff7ed; color: #c2410c; }
 .badge-payment-confirmed { background: #f0fdf4; color: #15803d; }
+.badge-zaad { background: #f0fdfa; color: #0f766e; }
+.badge-edahab { background: #eff6ff; color: #1d4ed8; }
 .badge-ordered { background: #eef2ff; color: #4338ca; }
 .badge-shipped { background: #faf5ff; color: #7e22ce; }
 .badge-delivered { background: #f3f4f6; color: #4b5563; }

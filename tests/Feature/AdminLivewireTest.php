@@ -62,18 +62,17 @@ class AdminLivewireTest extends TestCase
             ->test(QuoteBuilder::class, ['order' => $order])
             ->set('item_cost', '20')
             ->set('service_fee_pct', '10')
-            ->set('shipping_fee', '15')
             ->call('submitQuote')
             ->assertRedirect(route('admin.payments'));
 
         $order->refresh();
         $this->assertSame(OrderStatus::Quoted, $order->status);
-        $this->assertSame('37.00', $order->total_amount);
+        $this->assertSame('22.00', $order->total_amount);
 
         Livewire::actingAs($this->admin, 'admin')
             ->test(PaymentConfirmationQueue::class)
             ->assertSee('Awaiting customer')
-            ->assertSee('37.00');
+            ->assertSee('22.00');
     }
 
     public function test_payment_queue_lists_quoted_orders_awaiting_customer(): void
@@ -81,13 +80,13 @@ class AdminLivewireTest extends TestCase
         $user = User::factory()->create(['name' => 'Ayaan Ali']);
         $orders = app(OrderService::class);
         $order = $orders->create($user, 'https://www.shein.com/jacket.html');
-        $orders->applyQuote($order, 40, 10, 15, $this->admin);
+        $orders->applyQuote($order, 40, 10, $this->admin);
 
         Livewire::actingAs($this->admin, 'admin')
             ->test(PaymentConfirmationQueue::class)
             ->assertSet('filter', 'awaiting')
             ->assertSee('Ayaan Ali')
-            ->assertSee('59.00')
+            ->assertSee('44.00')
             ->call('cancel', $order->id)
             ->assertSee('cancelled');
 
@@ -99,12 +98,13 @@ class AdminLivewireTest extends TestCase
         $user = User::factory()->create();
         $orders = app(OrderService::class);
         $order = $orders->create($user, 'https://www.shein.com/shoes.html');
-        $orders->applyQuote($order, 30, 10, 15, $this->admin);
+        $orders->applyQuote($order, 30, 10, $this->admin);
         $orders->markPaymentSent($order->fresh(), 'edahab');
 
         Livewire::actingAs($this->admin, 'admin')
             ->test(PaymentConfirmationQueue::class)
             ->set('filter', 'confirm')
+            ->assertSee('eDahab')
             ->call('confirm', $order->id)
             ->assertSee('confirmed');
 

@@ -5,6 +5,7 @@ namespace App\Http\Requests\Api;
 use App\Rules\ProductLink;
 use App\Support\ProductLinkNormalizer;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class BatchOrderRequest extends FormRequest
 {
@@ -33,5 +34,24 @@ class BatchOrderRequest extends FormRequest
             'notes' => ['sometimes', 'array'],
             'notes.*' => ['nullable', 'string', 'max:2000'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if (! $this->has('notes')) {
+                return;
+            }
+
+            $links = $this->input('links', []);
+            $notes = $this->input('notes', []);
+
+            if (count($links) !== count($notes)) {
+                $validator->errors()->add(
+                    'notes',
+                    'Each item must include a matching variant note entry.',
+                );
+            }
+        });
     }
 }

@@ -142,10 +142,18 @@ Defined in `Suuqsade-App/lib/config/api_config.dart` — override with `--dart-d
 |------|-------|--------|
 | 1 | Laravel migrations + auth; Flutter scaffold | ✅ Done |
 | 2 | Order API + admin Livewire | ✅ Done & pushed |
-| 3 | Flutter core screens + FCM stub | ✅ Built (device testing in progress) |
-| 4 | Admin polish + E2E tests | ✅ Done locally, **not committed** |
-| 5 | Profile, i18n, branding, error states | ⏳ Next |
-| 6 | Deploy, app store, soft launch | ⏳ Planned |
+| 3 | Flutter core screens + FCM stub | ✅ Done |
+| 4 | Admin polish + E2E tests | ✅ Done & pushed (`85733bd`) |
+| 5 | Profile, i18n, branding, error states | ✅ Done locally (Flutter) |
+| 6 | Deploy, app store, soft launch | ⏳ Next |
+
+### Week 5 deliverables (2026-07-11)
+
+- **i18n:** English, Somali (`so`), Arabic (`ar`) — `lib/l10n/app_localizations.dart`
+- **Locale:** `localeProvider` persists language; profile change applies app-wide (RTL for Arabic)
+- **Profile:** Name validation, API errors, language sync to API + locale
+- **Branding:** `BrandWordmark`, branded splash loader, logo on home/login
+- **Error states:** `ErrorState`, `LoadingState`, retry on orders/notifications/order detail
 
 ---
 

@@ -27,7 +27,8 @@ class SettingsService
     public function publicSettings(): array
     {
         return [
-            'merchant_number' => $this->get('merchant_number', '0000000'),
+            'zaad_merchant_number' => $this->get('zaad_merchant_number', $this->get('merchant_number', '487960')),
+            'edahab_merchant_number' => $this->get('edahab_merchant_number', '19272'),
             'default_service_fee_pct' => $this->get('default_service_fee_pct', '10'),
             'default_shipping_fee' => $this->get('default_shipping_fee', '15.00'),
             'quote_response_hours' => $this->get('quote_response_hours', '24'),

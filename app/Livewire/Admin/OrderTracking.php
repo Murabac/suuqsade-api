@@ -21,6 +21,10 @@ class OrderTracking extends Component
 
     public ?string $trackingNote = null;
 
+    public ?int $deliveringOrderId = null;
+
+    public string $delivery_shipping_fee = '';
+
     public ?string $message = null;
 
     public function setFilter(string $filter): void
@@ -54,9 +58,53 @@ class OrderTracking extends Component
     {
         $order = Order::query()->findOrFail($orderId);
 
+        if ($order->status === OrderStatus::Shipped) {
+            $this->startDelivery($orderId, $orders);
+
+            return;
+        }
+
         try {
             $orders->advanceTracking($order, auth('admin')->user());
             $this->message = \App\Support\AdminUi::orderRef($order).' updated.';
+        } catch (\InvalidArgumentException $e) {
+            $this->message = $e->getMessage();
+        }
+    }
+
+    public function startDelivery(int $orderId, OrderService $orders): void
+    {
+        $this->deliveringOrderId = $orderId;
+        $this->delivery_shipping_fee = number_format($orders->defaultShippingFee(), 2, '.', '');
+    }
+
+    public function cancelDelivery(): void
+    {
+        $this->deliveringOrderId = null;
+        $this->delivery_shipping_fee = '';
+    }
+
+    public function confirmDelivery(OrderService $orders): void
+    {
+        if (! $this->deliveringOrderId) {
+            return;
+        }
+
+        $this->validate([
+            'delivery_shipping_fee' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        $order = Order::query()->findOrFail($this->deliveringOrderId);
+
+        try {
+            $orders->markDelivered(
+                $order,
+                (float) $this->delivery_shipping_fee,
+                auth('admin')->user(),
+            );
+            $this->message = \App\Support\AdminUi::orderRef($order).' delivered with shipping fee applied.';
+            $this->deliveringOrderId = null;
+            $this->delivery_shipping_fee = '';
         } catch (\InvalidArgumentException $e) {
             $this->message = $e->getMessage();
         }

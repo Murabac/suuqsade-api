@@ -19,8 +19,6 @@ class QuoteBuilder extends Component
 
     public string $service_fee_pct = '';
 
-    public string $shipping_fee = '';
-
     public bool $sent = false;
 
     public function mount(Order $order, OrderService $orders): void
@@ -31,7 +29,6 @@ class QuoteBuilder extends Component
 
         $this->order = $order->load('user');
         $this->service_fee_pct = (string) $orders->defaultServiceFeePct();
-        $this->shipping_fee = number_format($orders->defaultShippingFee(), 2, '.', '');
     }
 
     public function submitQuote(OrderService $orders): void
@@ -39,14 +36,12 @@ class QuoteBuilder extends Component
         $this->validate([
             'item_cost' => ['required', 'numeric', 'min:0.01'],
             'service_fee_pct' => ['required', 'numeric', 'min:0', 'max:100'],
-            'shipping_fee' => ['required', 'numeric', 'min:0'],
         ]);
 
         $orders->applyQuote(
             $this->order,
             (float) $this->item_cost,
             (float) $this->service_fee_pct,
-            (float) $this->shipping_fee,
             auth('admin')->user(),
         );
 
@@ -64,11 +59,6 @@ class QuoteBuilder extends Component
         return (float) ($this->service_fee_pct ?: 0);
     }
 
-    public function getShipNumProperty(): float
-    {
-        return (float) ($this->shipping_fee ?: 0);
-    }
-
     public function getFeeAmountProperty(): float
     {
         return round($this->itemNum * ($this->feeNum / 100), 2);
@@ -76,7 +66,7 @@ class QuoteBuilder extends Component
 
     public function getTotalProperty(): float
     {
-        return round($this->itemNum + $this->feeAmount + $this->shipNum, 2);
+        return round($this->itemNum + $this->feeAmount, 2);
     }
 
     public function render()

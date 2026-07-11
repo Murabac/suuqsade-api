@@ -19,7 +19,10 @@
                     {{ $order->product_link }}
                 </a>
                 @if ($order->product_note)
-                    <p style="margin:0.75rem 0 0;font-size:0.75rem;color:#6b7280">{{ $order->product_note }}</p>
+                    <div style="margin-top:0.75rem;padding:0.75rem;background:#f9fafb;border-radius:0.5rem">
+                        <p style="margin:0 0 0.25rem;font-size:0.6875rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em">Variant details</p>
+                        <p style="margin:0;font-size:0.8125rem;color:#374151;white-space:pre-line">{{ $order->product_note }}</p>
+                    </div>
                 @endif
                 <p style="margin:0.75rem 0 0;font-size:0.75rem;color:#6b7280">
                     Submitted {{ $order->created_at->diffForHumans() }}
@@ -57,13 +60,9 @@
                         @endif
                     </div>
 
-                    <div class="admin-field">
-                        <label>Shipping &amp; Customs (USD)</label>
-                        <div class="admin-input-wrap">
-                            <span class="admin-input-prefix">$</span>
-                            <input type="number" step="0.5" min="0" wire:model.live="shipping_fee" class="admin-input has-prefix">
-                        </div>
-                    </div>
+                    <p style="font-size:0.75rem;color:#6b7280;margin:0 0 1rem">
+                        Shipping &amp; customs are added when the order is delivered — the amount is not known at quote time.
+                    </p>
 
                     <div class="admin-breakdown-divider"></div>
 
@@ -71,17 +70,13 @@
                         <span style="color:#6b7280">Item cost</span>
                         <span>${{ number_format($this->itemNum, 2) }}</span>
                     </div>
-                    <div class="admin-breakdown-row">
+                    <div class="admin-breakdown-row" style="margin-bottom:1rem">
                         <span style="color:#6b7280">Service fee ({{ $service_fee_pct }}%)</span>
                         <span>${{ number_format($this->feeAmount, 2) }}</span>
                     </div>
-                    <div class="admin-breakdown-row" style="margin-bottom:1rem">
-                        <span style="color:#6b7280">Shipping</span>
-                        <span>${{ number_format($this->shipNum, 2) }}</span>
-                    </div>
 
                     <div class="admin-total-box">
-                        <span class="total-label">Total</span>
+                        <span class="total-label">Customer pays now</span>
                         <span class="total-value">${{ number_format($this->total, 2) }}</span>
                     </div>
 

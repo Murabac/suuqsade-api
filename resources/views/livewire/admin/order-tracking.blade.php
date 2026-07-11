@@ -38,7 +38,13 @@
                             <td><span class="admin-mono">{{ \App\Support\AdminUi::orderRef($order) }}</span></td>
                             <td><strong>{{ $order->user->name }}</strong></td>
                             <td><x-admin.status-badge :status="$order->status" /></td>
-                            <td class="text-right"><span class="admin-amount">${{ number_format((float) $order->total_amount, 2) }}</span></td>
+                            <td class="text-right">
+                                @if ($order->shipping_fee !== null)
+                                    <span class="admin-amount">${{ number_format((float) $order->item_cost + ((float) $order->item_cost * (float) $order->service_fee_pct / 100) + (float) $order->shipping_fee, 2) }}</span>
+                                @else
+                                    <span class="admin-amount">${{ number_format((float) $order->total_amount, 2) }}</span>
+                                @endif
+                            </td>
                             <td>
                                 @if ($editingOrderId === $order->id)
                                     <div style="display:flex;gap:0.5rem;align-items:center">
@@ -68,10 +74,21 @@
                                         Mark as shipped
                                     </button>
                                 @elseif ($order->status === \App\Enums\OrderStatus::Shipped)
-                                    <button type="button" class="admin-btn" wire:click="advance({{ $order->id }})" wire:loading.attr="disabled" wire:target="advance({{ $order->id }})">
-                                        @include('components.admin.icons.arrow-right')
-                                        Mark as delivered
-                                    </button>
+                                    @if ($deliveringOrderId === $order->id)
+                                        <div style="display:flex;gap:0.35rem;align-items:center;justify-content:flex-end;flex-wrap:wrap">
+                                            <div class="admin-input-wrap" style="width:6rem">
+                                                <span class="admin-input-prefix">$</span>
+                                                <input type="number" step="0.5" min="0" wire:model="delivery_shipping_fee" class="admin-input has-prefix" placeholder="0.00">
+                                            </div>
+                                            <button type="button" class="admin-btn admin-btn-sm" wire:click="confirmDelivery" wire:loading.attr="disabled">Deliver</button>
+                                            <button type="button" class="admin-btn admin-btn-sm admin-btn-secondary" wire:click="cancelDelivery">Cancel</button>
+                                        </div>
+                                    @else
+                                        <button type="button" class="admin-btn" wire:click="advance({{ $order->id }})" wire:loading.attr="disabled" wire:target="advance({{ $order->id }})">
+                                            @include('components.admin.icons.arrow-right')
+                                            Mark as delivered
+                                        </button>
+                                    @endif
                                 @endif
                             </td>
                         </tr>

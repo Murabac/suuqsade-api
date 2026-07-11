@@ -50,6 +50,17 @@ class OrderService
         return $orders;
     }
 
+    public function updateProductNote(Order $order, ?string $productNote): Order
+    {
+        if (! in_array($order->status, [OrderStatus::Submitted, OrderStatus::Quoted], true)) {
+            throw new \InvalidArgumentException('Variant details can no longer be changed.');
+        }
+
+        $order->update(['product_note' => $productNote]);
+
+        return $order->fresh();
+    }
+
     public function markPaymentSent(Order $order, string $method): Order
     {
         if ($order->status !== OrderStatus::Quoted) {
@@ -65,15 +76,15 @@ class OrderService
         return $this->statusService->transition($order, OrderStatus::PaymentPending);
     }
 
-    public function applyQuote(Order $order, float $itemCost, float $serviceFeePct, float $shippingFee, ?\App\Models\Admin $admin = null): Order
+    public function applyQuote(Order $order, float $itemCost, float $serviceFeePct, ?\App\Models\Admin $admin = null): Order
     {
         $serviceFee = round($itemCost * ($serviceFeePct / 100), 2);
-        $total = round($itemCost + $serviceFee + $shippingFee, 2);
+        $total = round($itemCost + $serviceFee, 2);
 
         return $this->statusService->transition($order, OrderStatus::Quoted, $admin, [
             'item_cost' => $itemCost,
             'service_fee_pct' => $serviceFeePct,
-            'shipping_fee' => $shippingFee,
+            'shipping_fee' => null,
             'total_amount' => $total,
         ]);
     }
@@ -93,11 +104,21 @@ class OrderService
         $next = match ($order->status) {
             OrderStatus::PaymentConfirmed => OrderStatus::Ordered,
             OrderStatus::Ordered => OrderStatus::Shipped,
-            OrderStatus::Shipped => OrderStatus::Delivered,
             default => throw new \InvalidArgumentException('Order cannot be advanced.'),
         };
 
         return $this->statusService->transition($order, $next, $admin);
+    }
+
+    public function markDelivered(Order $order, float $shippingFee, \App\Models\Admin $admin): Order
+    {
+        if ($order->status !== OrderStatus::Shipped) {
+            throw new \InvalidArgumentException('Only shipped orders can be marked delivered.');
+        }
+
+        return $this->statusService->transition($order, OrderStatus::Delivered, $admin, [
+            'shipping_fee' => $shippingFee,
+        ]);
     }
 
     public function cancelOrder(Order $order, \App\Models\Admin $admin): Order

@@ -37,7 +37,7 @@
                                     @include('components.admin.icons.external-link')
                                 </a>
                                 @if ($order->product_note)
-                                    <br><span style="font-size:0.75rem;color:#6b7280">{{ $order->product_note }}</span>
+                                    <br><span style="font-size:0.75rem;color:#374151;white-space:pre-line">{{ $order->product_note }}</span>
                                 @endif
                             </td>
                             <td>

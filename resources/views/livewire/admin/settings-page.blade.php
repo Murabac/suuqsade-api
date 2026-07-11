@@ -31,12 +31,17 @@
                     </div>
 
                     <div class="admin-panel" style="margin-top:1.5rem;padding:0;border:0">
-                        <p class="admin-panel-label">Merchant Payment Numbers</p>
-                        <p class="admin-field-hint">Shared with customers when requesting payment. Same number for ZAAD and eDahab (MVP).</p>
+                        <p class="admin-panel-label">Mobile money merchant numbers</p>
+                        <p class="admin-field-hint">Shown on the customer payment screen with a dial button for each provider.</p>
 
                         <div class="admin-field">
-                            <label>Merchant Number</label>
-                            <input type="tel" wire:model="merchant_number" placeholder="e.g. 0634-000000" class="admin-input admin-mono">
+                            <label>ZAAD merchant number</label>
+                            <input type="tel" wire:model="zaad_merchant_number" placeholder="e.g. 487960" class="admin-input admin-mono">
+                        </div>
+
+                        <div class="admin-field">
+                            <label>eDahab merchant number</label>
+                            <input type="tel" wire:model="edahab_merchant_number" placeholder="e.g. 19272" class="admin-input admin-mono">
                         </div>
 
                         <div class="admin-field">

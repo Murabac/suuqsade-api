@@ -81,7 +81,8 @@ class AuthApiTest extends TestCase
         $this->getJson('/api/settings/public')
             ->assertOk()
             ->assertJsonStructure([
-                'merchant_number',
+                'zaad_merchant_number',
+                'edahab_merchant_number',
                 'default_service_fee_pct',
                 'default_shipping_fee',
             ]);

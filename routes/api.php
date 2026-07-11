@@ -19,10 +19,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user/fcm-token', [UserController::class, 'storeFcmToken']);
 
     Route::get('/notifications', [UserController::class, 'notifications']);
+    Route::post('/notifications/read-all', [UserController::class, 'markAllNotificationsRead']);
+    Route::post('/notifications/{notification}/read', [UserController::class, 'markNotificationRead']);
 
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
     Route::post('/orders/batch', [OrderController::class, 'storeBatch']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
+    Route::put('/orders/{order}/variant', [OrderController::class, 'updateVariant']);
     Route::post('/orders/{order}/payment-sent', [OrderController::class, 'paymentSent']);
 });

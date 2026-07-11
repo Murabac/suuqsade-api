@@ -7,10 +7,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\BatchOrderRequest;
 use App\Http\Requests\Api\PaymentSentRequest;
 use App\Http\Requests\Api\StoreOrderRequest;
+use App\Http\Requests\Api\UpdateProductNoteRequest;
 use App\Http\Resources\OrderDetailResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Services\OrderService;
+use App\Services\ProductMetadataService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -61,10 +63,11 @@ class OrderController extends Controller
             ->setStatusCode(201);
     }
 
-    public function show(Request $request, Order $order): OrderDetailResource
+    public function show(Request $request, Order $order, ProductMetadataService $metadata): OrderDetailResource
     {
         $this->authorize('view', $order);
 
+        $order = $metadata->fetchForOrder($order);
         $order->load(['statusHistory' => fn ($q) => $q->orderBy('created_at'), 'payments']);
 
         return new OrderDetailResource($order);
@@ -76,6 +79,19 @@ class OrderController extends Controller
 
         try {
             $updated = $orders->markPaymentSent($order, $request->validated('method'));
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return new OrderResource($updated);
+    }
+
+    public function updateVariant(UpdateProductNoteRequest $request, Order $order, OrderService $orders): OrderResource|JsonResponse
+    {
+        $this->authorize('update', $order);
+
+        try {
+            $updated = $orders->updateProductNote($order, $request->validated('product_note'));
         } catch (\InvalidArgumentException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }

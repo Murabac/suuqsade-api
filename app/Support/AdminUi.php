@@ -43,6 +43,24 @@ class AdminUi
         };
     }
 
+    public static function paymentMethodLabel(?string $method): string
+    {
+        return match ($method) {
+            'zaad' => 'ZAAD',
+            'edahab' => 'eDahab',
+            default => '—',
+        };
+    }
+
+    public static function paymentMethodBadgeClass(?string $method): string
+    {
+        return match ($method) {
+            'zaad' => 'badge-zaad',
+            'edahab' => 'badge-edahab',
+            default => 'badge-quoted',
+        };
+    }
+
     public static function statusBadgeClass(OrderStatus $status): string
     {
         return match ($status) {

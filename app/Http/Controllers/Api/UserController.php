@@ -45,4 +45,27 @@ class UserController extends Controller
 
         return NotificationResource::collection($notifications);
     }
+
+    public function markNotificationRead(int $notification): NotificationResource
+    {
+        $record = request()->user()->notifications()->findOrFail($notification);
+
+        if ($record->read_at === null) {
+            $record->update(['read_at' => now()]);
+        }
+
+        return new NotificationResource($record->fresh());
+    }
+
+    public function markAllNotificationsRead(): JsonResponse
+    {
+        request()->user()
+            ->notifications()
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        return response()->json([
+            'message' => 'All notifications marked as read.',
+        ]);
+    }
 }

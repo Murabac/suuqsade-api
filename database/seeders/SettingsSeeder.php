@@ -13,7 +13,8 @@ class SettingsSeeder extends Seeder
         $defaults = [
             'default_service_fee_pct' => '10',
             'default_shipping_fee' => '15.00',
-            'merchant_number' => '0000000',
+            'zaad_merchant_number' => '487960',
+            'edahab_merchant_number' => '19272',
             'quote_response_hours' => '24',
             'payment_confirm_minutes' => '30',
         ];
