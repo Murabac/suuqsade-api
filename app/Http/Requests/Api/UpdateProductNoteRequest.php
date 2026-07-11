@@ -14,7 +14,7 @@ class UpdateProductNoteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_note' => ['nullable', 'string', 'max:2000'],
+            'product_note' => ['present', 'nullable', 'string', 'max:2000'],
         ];
     }
 }

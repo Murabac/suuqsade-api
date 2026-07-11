@@ -42,6 +42,17 @@ class OrderFlowE2eTest extends TestCase
             ->assertJsonValidationErrors(['product_link']);
     }
 
+    public function test_rejects_shein_host_bypass_domains(): void
+    {
+        Sanctum::actingAs($this->user);
+
+        $this->postJson('/api/orders', [
+            'product_link' => 'https://shein.com.evil.com/product/123',
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['product_link']);
+    }
+
     public function test_accepts_orders_without_variant_note(): void
     {
         Sanctum::actingAs($this->user);
@@ -70,6 +81,62 @@ class OrderFlowE2eTest extends TestCase
             ->assertJsonPath('data.product_note', self::VARIANT_NOTE);
 
         $this->assertSame(self::VARIANT_NOTE, $order->fresh()->product_note);
+    }
+
+    public function test_empty_variant_update_does_not_clear_existing_note(): void
+    {
+        Sanctum::actingAs($this->user);
+
+        $order = app(OrderService::class)->create(
+            $this->user,
+            'https://www.shein.com/test-product.html',
+            self::VARIANT_NOTE,
+        );
+
+        $this->putJson("/api/orders/{$order->id}/variant", [])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['product_note']);
+
+        $this->assertSame(self::VARIANT_NOTE, $order->fresh()->product_note);
+    }
+
+    public function test_variant_update_rejected_after_payment_sent(): void
+    {
+        Sanctum::actingAs($this->user);
+
+        $order = app(OrderService::class)->create(
+            $this->user,
+            'https://www.shein.com/test-product.html',
+            self::VARIANT_NOTE,
+        );
+
+        app(OrderService::class)->applyQuote($order, 25.00, 10, $this->admin);
+        $order->refresh();
+
+        $this->postJson("/api/orders/{$order->id}/payment-sent", ['method' => 'zaad'])
+            ->assertOk();
+
+        $this->putJson("/api/orders/{$order->id}/variant", [
+            'product_note' => "Size: L\nColor: Red\nQuantity: 2",
+        ])
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Variant details can no longer be changed.');
+
+        $this->assertSame(self::VARIANT_NOTE, $order->fresh()->product_note);
+    }
+
+    public function test_batch_order_accepts_empty_notes_array(): void
+    {
+        Sanctum::actingAs($this->user);
+
+        $this->postJson('/api/orders/batch', [
+            'links' => [
+                'https://www.shein.com/item-1.html',
+                'https://www.amazon.com/dp/B12345678',
+            ],
+            'notes' => [],
+        ])->assertCreated()
+            ->assertJsonCount(2, 'data');
     }
 
     public function test_accepts_shein_and_amazon_links(): void

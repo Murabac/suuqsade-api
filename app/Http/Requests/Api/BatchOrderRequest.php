@@ -46,6 +46,10 @@ class BatchOrderRequest extends FormRequest
             $links = $this->input('links', []);
             $notes = $this->input('notes', []);
 
+            if ($notes === []) {
+                return;
+            }
+
             if (count($links) !== count($notes)) {
                 $validator->errors()->add(
                     'notes',

@@ -10,7 +10,7 @@ class ProductMetadataService
 
     public function needsFetch(Order $order): bool
     {
-        return in_array($order->product_metadata_status, ['pending', 'failed'], true);
+        return $order->product_metadata_status === 'pending';
     }
 
     public function fetchForOrder(Order $order): Order

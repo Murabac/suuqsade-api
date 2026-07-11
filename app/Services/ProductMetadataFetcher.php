@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Support\ProductLinkNormalizer;
+use App\Support\SupportedProductHost;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -10,17 +11,7 @@ class ProductMetadataFetcher
 {
     public function detectPlatform(string $url): string
     {
-        $host = strtolower(parse_url($url, PHP_URL_HOST) ?? '');
-
-        if (str_contains($host, 'shein.com')) {
-            return 'shein';
-        }
-
-        if (preg_match('/(^|\.)amazon\./', $host)) {
-            return 'amazon';
-        }
-
-        return 'unknown';
+        return SupportedProductHost::detectPlatform($url);
     }
 
     /**
@@ -29,6 +20,11 @@ class ProductMetadataFetcher
     public function fetch(string $url): array
     {
         $url = ProductLinkNormalizer::normalize($url);
+
+        if (! SupportedProductHost::isAllowed($url)) {
+            return $this->emptyResult($url);
+        }
+
         $html = $this->fetchHtml($url);
 
         if ($html === null) {
@@ -67,10 +63,22 @@ class ProductMetadataFetcher
 
     private function fetchHtml(string $url): ?string
     {
+        if (! SupportedProductHost::isAllowed($url)) {
+            return null;
+        }
+
         try {
             $response = Http::withOptions([
-                'verify' => config('services.product_fetch.verify_ssl', false),
-                'allow_redirects' => true,
+                'verify' => config('services.product_fetch.verify_ssl', true),
+                'allow_redirects' => [
+                    'max' => 5,
+                    'protocols' => ['http', 'https'],
+                    'on_redirect' => function ($request, $response, $uri): void {
+                        if (! SupportedProductHost::isAllowed((string) $uri)) {
+                            throw new \RuntimeException('Disallowed redirect target.');
+                        }
+                    },
+                ],
                 'timeout' => 20,
             ])->withHeaders([
                 'User-Agent' => 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36',

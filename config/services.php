@@ -40,7 +40,7 @@ return [
     ],
 
     'product_fetch' => [
-        'verify_ssl' => env('PRODUCT_FETCH_VERIFY_SSL', false),
+        'verify_ssl' => env('PRODUCT_FETCH_VERIFY_SSL', true),
     ],
 
 ];
