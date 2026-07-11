@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
         View::composer('layouts.admin', function ($view) {
             $view->with([
                 'incomingCount' => Order::query()->where('status', OrderStatus::Submitted)->count(),
+                'quotedCount' => Order::query()->where('status', OrderStatus::Quoted)->count(),
                 'paymentCount' => Order::query()->where('status', OrderStatus::PaymentPending)->count(),
             ]);
         });

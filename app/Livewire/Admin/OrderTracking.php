@@ -15,11 +15,18 @@ class OrderTracking extends Component
 {
     public string $search = '';
 
+    public string $filter = 'active';
+
     public ?int $editingOrderId = null;
 
     public ?string $trackingNote = null;
 
     public ?string $message = null;
+
+    public function setFilter(string $filter): void
+    {
+        $this->filter = in_array($filter, ['active', 'delivered'], true) ? $filter : 'active';
+    }
 
     public function startTrackingNote(int $orderId): void
     {
@@ -57,13 +64,17 @@ class OrderTracking extends Component
 
     public function render()
     {
-        $orders = Order::query()
-            ->with('user')
-            ->whereIn('status', [
+        $statuses = $this->filter === 'delivered'
+            ? [OrderStatus::Delivered]
+            : [
                 OrderStatus::PaymentConfirmed,
                 OrderStatus::Ordered,
                 OrderStatus::Shipped,
-            ])
+            ];
+
+        $orders = Order::query()
+            ->with('user')
+            ->whereIn('status', $statuses)
             ->when($this->search !== '', function ($query) {
                 $term = '%'.$this->search.'%';
                 $query->where(function ($q) use ($term) {

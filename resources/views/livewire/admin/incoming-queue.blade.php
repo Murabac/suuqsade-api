@@ -11,6 +11,10 @@
     </div>
 
     <div class="admin-page-body">
+        @if ($message)
+            <p class="admin-success-msg">{{ $message }}</p>
+        @endif
+
         <div class="admin-table-card">
             <table class="admin-table">
                 <thead>
@@ -43,10 +47,19 @@
                                 </span>
                             </td>
                             <td class="text-right">
-                                <a href="{{ route('admin.orders.quote', $order) }}" class="admin-btn">
-                                    Quote
-                                    @include('components.admin.icons.chevron-right')
-                                </a>
+                                <div style="display:flex;gap:0.35rem;justify-content:flex-end">
+                                    <a href="{{ route('admin.orders.quote', $order) }}" class="admin-btn" wire:navigate>
+                                        Quote
+                                        @include('components.admin.icons.chevron-right')
+                                    </a>
+                                    <button type="button" class="admin-btn admin-btn-danger admin-btn-sm"
+                                        wire:click="cancel({{ $order->id }})"
+                                        wire:confirm="Cancel this order?"
+                                        wire:loading.attr="disabled"
+                                        wire:target="cancel({{ $order->id }})">
+                                        Cancel
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     @empty

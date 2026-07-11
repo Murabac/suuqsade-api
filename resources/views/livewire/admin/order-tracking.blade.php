@@ -2,7 +2,7 @@
     <div class="admin-page-header">
         <div>
             <h1>Order Tracking</h1>
-            <p>{{ $orders->count() }} active orders in fulfillment</p>
+            <p>{{ $orders->count() }} {{ $filter === 'delivered' ? 'delivered' : 'active' }} orders</p>
         </div>
         <div class="admin-search-wrap">
             @include('components.admin.icons.search')
@@ -14,6 +14,11 @@
         @if ($message)
             <p class="admin-success-msg">{{ $message }}</p>
         @endif
+
+        <div class="admin-filter-tabs">
+            <button type="button" class="admin-filter-tab @if($filter === 'active') active @endif" wire:click="setFilter('active')">Active</button>
+            <button type="button" class="admin-filter-tab @if($filter === 'delivered') active @endif" wire:click="setFilter('delivered')">Delivered</button>
+        </div>
 
         <div class="admin-table-card">
             <table class="admin-table">
@@ -38,7 +43,7 @@
                                 @if ($editingOrderId === $order->id)
                                     <div style="display:flex;gap:0.5rem;align-items:center">
                                         <input type="text" class="admin-note-input" wire:model="trackingNote" wire:keydown.enter="saveTrackingNote" placeholder="Add tracking note…" autofocus>
-                                        <button type="button" class="admin-btn" wire:click="saveTrackingNote">Save</button>
+                                        <button type="button" class="admin-btn admin-btn-sm" wire:click="saveTrackingNote" wire:loading.attr="disabled">Save</button>
                                     </div>
                                 @else
                                     <button type="button" class="admin-note-btn" wire:click="startTrackingNote({{ $order->id }})" title="Click to edit note">
@@ -47,18 +52,23 @@
                                 @endif
                             </td>
                             <td class="text-right">
-                                @if ($order->status === \App\Enums\OrderStatus::PaymentConfirmed)
-                                    <button type="button" class="admin-btn" wire:click="advance({{ $order->id }})">
+                                @if ($order->status === \App\Enums\OrderStatus::Delivered)
+                                    <span class="admin-delivered-label">
+                                        @include('components.admin.icons.check-circle')
+                                        Delivered
+                                    </span>
+                                @elseif ($order->status === \App\Enums\OrderStatus::PaymentConfirmed)
+                                    <button type="button" class="admin-btn" wire:click="advance({{ $order->id }})" wire:loading.attr="disabled" wire:target="advance({{ $order->id }})">
                                         @include('components.admin.icons.arrow-right')
                                         Mark as ordered
                                     </button>
                                 @elseif ($order->status === \App\Enums\OrderStatus::Ordered)
-                                    <button type="button" class="admin-btn" wire:click="advance({{ $order->id }})">
+                                    <button type="button" class="admin-btn" wire:click="advance({{ $order->id }})" wire:loading.attr="disabled" wire:target="advance({{ $order->id }})">
                                         @include('components.admin.icons.arrow-right')
                                         Mark as shipped
                                     </button>
                                 @elseif ($order->status === \App\Enums\OrderStatus::Shipped)
-                                    <button type="button" class="admin-btn" wire:click="advance({{ $order->id }})">
+                                    <button type="button" class="admin-btn" wire:click="advance({{ $order->id }})" wire:loading.attr="disabled" wire:target="advance({{ $order->id }})">
                                         @include('components.admin.icons.arrow-right')
                                         Mark as delivered
                                     </button>
@@ -67,7 +77,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="admin-empty">No orders in tracking.</td>
+                            <td colspan="6" class="admin-empty">No orders in this view.</td>
                         </tr>
                     @endforelse
                 </tbody>

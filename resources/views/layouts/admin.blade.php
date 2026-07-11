@@ -21,6 +21,10 @@
             </div>
 
             <nav class="admin-nav">
+                <a href="{{ route('admin.dashboard') }}" class="admin-nav-link @if(request()->routeIs('admin.dashboard')) active @endif">
+                    @include('components.admin.icons.layout-dashboard')
+                    <span class="admin-nav-label">Dashboard</span>
+                </a>
                 <a href="{{ route('admin.incoming') }}" class="admin-nav-link @if(request()->routeIs('admin.incoming')) active @endif">
                     @include('components.admin.icons.inbox')
                     <span class="admin-nav-label">Incoming Queue</span>
@@ -34,9 +38,9 @@
                 </a>
                 <a href="{{ route('admin.payments') }}" class="admin-nav-link @if(request()->routeIs('admin.payments')) active @endif">
                     @include('components.admin.icons.credit-card')
-                    <span class="admin-nav-label">Payment Confirmation</span>
-                    @if(($paymentCount ?? 0) > 0)
-                        <span class="admin-nav-badge">{{ $paymentCount }}</span>
+                    <span class="admin-nav-label">Payments</span>
+                    @if(($quotedCount ?? 0) + ($paymentCount ?? 0) > 0)
+                        <span class="admin-nav-badge">{{ ($quotedCount ?? 0) + ($paymentCount ?? 0) }}</span>
                     @endif
                 </a>
                 <a href="{{ route('admin.tracking') }}" class="admin-nav-link @if(request()->routeIs('admin.tracking')) active @endif">

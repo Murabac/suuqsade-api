@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api;
 
 use App\Rules\ProductLink;
+use App\Support\ProductLinkNormalizer;
 use Illuminate\Foundation\Http\FormRequest;
 
 class BatchOrderRequest extends FormRequest
@@ -10,6 +11,18 @@ class BatchOrderRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('links') && is_array($this->input('links'))) {
+            $this->merge([
+                'links' => array_map(
+                    fn (mixed $link) => ProductLinkNormalizer::normalize((string) $link),
+                    $this->input('links'),
+                ),
+            ]);
+        }
     }
 
     public function rules(): array

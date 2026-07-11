@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
-use App\Http\Controllers\Admin\DashboardController;
+use App\Livewire\Admin\DashboardOverview;
 use App\Livewire\Admin\IncomingQueue;
 use App\Livewire\Admin\OrderTracking;
 use App\Livewire\Admin\PaymentConfirmationQueue;
@@ -22,7 +22,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::middleware('auth:admin')->group(function () {
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
-        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/', DashboardOverview::class)->name('dashboard');
         Route::get('/incoming', IncomingQueue::class)->name('incoming');
         Route::get('/quote', QuoteBuilderIndex::class)->name('quote');
         Route::get('/orders/{order}/quote', QuoteBuilder::class)->name('orders.quote');

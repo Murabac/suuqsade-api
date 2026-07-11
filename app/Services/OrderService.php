@@ -100,6 +100,19 @@ class OrderService
         return $this->statusService->transition($order, $next, $admin);
     }
 
+    public function cancelOrder(Order $order, \App\Models\Admin $admin): Order
+    {
+        if (! in_array($order->status, [
+            OrderStatus::Submitted,
+            OrderStatus::Quoted,
+            OrderStatus::PaymentPending,
+        ], true)) {
+            throw new \InvalidArgumentException('This order can no longer be cancelled.');
+        }
+
+        return $this->statusService->transition($order, OrderStatus::Cancelled, $admin);
+    }
+
     public function defaultServiceFeePct(): float
     {
         return (float) $this->settings->get('default_service_fee_pct', '10');

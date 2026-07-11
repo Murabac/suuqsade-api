@@ -14,7 +14,7 @@ class AuthController extends Controller
     public function showLogin(): View|RedirectResponse
     {
         if (Auth::guard('admin')->check()) {
-            return redirect()->route('admin.incoming');
+            return redirect()->route('admin.dashboard');
         }
 
         return view('layouts.admin-guest');
@@ -33,7 +33,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('admin.incoming'));
+        return redirect()->intended(route('admin.dashboard'));
     }
 
     public function logout(Request $request): RedirectResponse

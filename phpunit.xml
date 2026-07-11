@@ -31,6 +31,7 @@
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
-        <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="OTP_FIXED_CODE" value="123456"/>
+        <env name="OTP_BYPASS" value="true"/>
     </php>
 </phpunit>
