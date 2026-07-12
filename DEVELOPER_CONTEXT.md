@@ -23,14 +23,21 @@
 
 ## 2. Local environment (Windows)
 
-### PHP 8.3 (portable — not on system PATH by default)
+### PHP 8.5.8 (primary — add to PATH)
+
+```
+C:\Program Files\php-8.5.8\php.exe
+```
+
+**php.ini configured:** `extension_dir = "ext"` plus `mbstring`, `curl`, `fileinfo`, `openssl`, `pdo_sqlite`, `sqlite3`, `zip`, `intl` (required for Laravel and `php artisan test`).
+
+Fallback (older portable install):
 
 ```
 C:\Users\lappybooks\AppData\Local\Programs\PHP\8.3\php.exe
-C:\Users\lappybooks\AppData\Local\Programs\PHP\8.3\composer.phar
 ```
 
-**php.ini fix applied:** `pdo_sqlite` and `sqlite3` enabled (required for `php artisan test`).
+**Do NOT use** `C:\xampp\php\php.exe` (PHP 8.2 — too old for this project).
 
 ### MySQL (XAMPP 8.2)
 
@@ -62,7 +69,7 @@ Physical device: SM S918B (id: R5CW318NCLD, Android 16)
 ### API + Admin (must bind to all interfaces for phone)
 
 ```powershell
-$php = "$env:LOCALAPPDATA\Programs\PHP\8.3\php.exe"
+$php = "C:\Program Files\php-8.5.8\php.exe"
 cd c:\Users\lappybooks\MurabacApps\Suuqsade-API
 & $php artisan serve --host=0.0.0.0 --port=8000
 ```
@@ -97,7 +104,8 @@ flutter run --dart-define=API_BASE_URL=http://127.0.0.1:8000
 
 ```powershell
 cd c:\Users\lappybooks\MurabacApps\Suuqsade-API
-& "$env:LOCALAPPDATA\Programs\PHP\8.3\php.exe" artisan test
+.\test.ps1
+# or: & "C:\Program Files\php-8.5.8\php.exe" artisan test
 ```
 
 **Status:** 19 tests passing (auth, order E2E, admin Livewire).

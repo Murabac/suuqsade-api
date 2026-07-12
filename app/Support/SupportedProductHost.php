@@ -42,7 +42,10 @@ class SupportedProductHost
 
     public static function isAmazonHost(string $host): bool
     {
-        return (bool) preg_match('/(^|\.)amazon\.[a-z]{2,}$/', $host);
+        return (bool) preg_match(
+            '/^(?:[a-z0-9-]+\.)*amazon\.(?:com|ae|co\.uk|de|fr|ca|it|es|nl|se|pl|sa|sg|in|jp|com\.au|com\.mx|com\.be|com\.tr)$/',
+            $host,
+        );
     }
 
     private static function isPrivateOrLocalHost(string $host): bool
